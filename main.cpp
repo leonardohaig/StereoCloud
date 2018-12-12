@@ -47,7 +47,7 @@ int main()
     if( !stereoVideoCapture.OpenCamera(strVideoPath) )
         return -1;
 #else
-    if( !stereoVideoCapture.OpenCamera(0) )
+    if( !stereoVideoCapture.OpenCamera(1) )
         return -1;
 #endif
 
@@ -85,12 +85,24 @@ int main()
                 break;
 
 
-            kittiCloudGenerator.cloudGenerator(leftImag, rightImage, Q, cloud_rgbxyz);
+            cloud_rgbxyz->clear();
+
+            kittiCloudGenerator.cloudGenerator(leftImag, rightImage, Q, cloud_rgbxyz,
+                                               0,//int minDisparity=0,
+                                               11,// int blockSize=11,
+                                               1,//int disp12MaxDiff=1,
+                                               63,//int preFilterCap=63,
+                                               15,//int uniquenessRatio=15,
+                                               200,//int speckleWindowSize=200,
+                                               2//int speckleRange=2
+                                               );
 
             viewer->removeAllPointClouds();
             viewer->removeAllShapes();
-            viewer->addPointCloud<pcl::PointXYZRGB>(cloud_rgbxyz, "sample cloud");
 
+
+            pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud_rgbxyz);
+            viewer->addPointCloud<pcl::PointXYZRGB> (cloud_rgbxyz, rgb, "sample cloud");
             viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "sample cloud");
 
             //bNextPointCloud = false;
